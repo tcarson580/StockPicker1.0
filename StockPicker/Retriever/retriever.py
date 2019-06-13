@@ -162,7 +162,7 @@ class Trade():
             if buyDateAgo in stockHighs:
                 buyPrice = stockHighs[buyDateAgo]
                 
-                for sellDaysAgo in range(buyDaysAgo, 0):
+                for sellDaysAgo in range(buyDaysAgo, (buyDaysAgo+31)):
                     sellDateAgo = (today + dt.timedelta(sellDaysAgo)).strftime('%Y-%m-%d')
                     if sellDateAgo in stockLows:
                         sellPrice = stockLows[sellDateAgo]
@@ -193,6 +193,7 @@ if __name__ == '__main__':
 
     t1 = time.time()
     total = t1-t0
+    print(total, "seconds")
     #firstDay = Trade.first_open_market_day(f, daysAgo)
     #lastDay = Trade.last_open_market_day(f, daysAgo)
     #print(firstDay["open"] - lastDay["open"])
