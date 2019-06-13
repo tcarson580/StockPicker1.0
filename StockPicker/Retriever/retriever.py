@@ -9,6 +9,7 @@ from matplotlib import style
 import pandas as pd
 import pandas_datareader.data as web
 import array
+import time
 
 # Aids in finding data from IEX
 class Trade():
@@ -103,7 +104,13 @@ class Trade():
 #                     daysAgo += 1
 #             except:
 #                 daysAgo += 1
-                
+     
+     
+    @classmethod    
+    def getStockSymbols(self, fileName):
+        file = open(fileName, "r")
+        return str(file.read()).split(",")
+          
     # Returns stock high for the day, or None if no data exists
     @classmethod
     def getHigh(self, data, today, dateAgo):
@@ -134,6 +141,8 @@ class Trade():
         
     @classmethod
     def getStockLows(self, data, today, dataDaysAgo):
+        stockLows = {}
+        
         for lowDaysAgo in range(dataDaysAgo, 0):
             dateAgo = today + dt.timedelta(lowDaysAgo)
             currentLow = Trade.getLow(data, today, dateAgo)
@@ -142,36 +151,48 @@ class Trade():
             
         return stockLows
     
+    @classmethod
+    def calculateBuySellDates(self, data, today, dataDaysAgo, stockName, stockHighs, stockLows):
+        file = open("stocksRecord", "a")
+        
+        minimumProfit = 1.1 #10% ROI
+        
+        for buyDaysAgo in range(dataDaysAgo, 0):
+            buyDateAgo = (today + dt.timedelta(buyDaysAgo)).strftime('%Y-%m-%d')
+            if buyDateAgo in stockHighs:
+                buyPrice = stockHighs[buyDateAgo]
+                
+                for sellDaysAgo in range(buyDaysAgo, 0):
+                    sellDateAgo = (today + dt.timedelta(sellDaysAgo)).strftime('%Y-%m-%d')
+                    if sellDateAgo in stockLows:
+                        sellPrice = stockLows[sellDateAgo]
+                        if sellPrice >= buyPrice * minimumProfit:
+                            file.write(str(stockName) + ", " + str(buyDateAgo) + ", " + str(buyPrice) + ", " + str(sellDateAgo) + ", " + str(sellPrice) + "\n")
+                            break
+        file.close()    
+                   
 if __name__ == '__main__':
     #style.use('ggplot')
-    
-    file = open("stocksRecord", "a")
+    t0 = time.time()
+    file = open("stocksRecord", "w").close()
     
     dataDaysAgo = -180
     today = dt.datetime.now()
     dateAgo = today + dt.timedelta(dataDaysAgo)
     
-    stockLows = {}
-    stockName = 'TSLA'
-    data = web.DataReader(stockName, 'iex', dateAgo, today)
+    stockNames = Trade().getStockSymbols("sp500_symbols")
     
-    stockHighs = Trade.getStockHighs()
-    stockLows = Trade.getStockLows()
-    
-    for buyDaysAgo in range(dataDaysAgo, 0):
-        buyDateAgo = (today + dt.timedelta(buyDaysAgo)).strftime('%Y-%m-%d')
-        if buyDateAgo in stockHighs:
-            buyPrice = stockHighs[buyDateAgo]
-            
-            for sellDaysAgo in range(buyDaysAgo, 0):
-                sellDateAgo = (today + dt.timedelta(sellDaysAgo)).strftime('%Y-%m-%d')
-                if sellDateAgo in stockLows:
-                    sellPrice = stockLows[sellDateAgo]
-                    if sellPrice >= buyPrice*1.1:
-                        file.write(str(stockName) + ", " + str(buyDateAgo) + ", " + str(buyPrice) + ", " + str(sellDateAgo) + ", " + str(sellPrice) + "\n")
-                        break
-        
-    file.close()
+    for stockName in stockNames:
+        try:
+            data = web.DataReader(stockName, 'iex', dateAgo, today)
+            stockHighs = Trade.getStockHighs(data, today, dataDaysAgo)
+            stockLows = Trade.getStockLows(data, today, dataDaysAgo)
+            Trade().calculateBuySellDates(data, today, dataDaysAgo, stockName, stockHighs, stockLows)
+        except:
+            None
+
+    t1 = time.time()
+    total = t1-t0
     #firstDay = Trade.first_open_market_day(f, daysAgo)
     #lastDay = Trade.last_open_market_day(f, daysAgo)
     #print(firstDay["open"] - lastDay["open"])
