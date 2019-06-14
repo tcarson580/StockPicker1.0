@@ -5,6 +5,7 @@ Created on Jun 13, 2019
 '''
 import datetime as dt
 import time
+import pandas_datareader.data as web
 
 class simulator():
     '''
@@ -38,9 +39,11 @@ class simulator():
 if __name__ == '__main__':
     t0 = time.time()
     
+    maxPurchasePercentage = 0.05
     startingCapital = 1000.00
     investableCapital = startingCapital
-    maxPurchase = 0.05*startingCapital
+    currentNetWorth = startingCapital
+    maxPurchase = maxPurchasePercentage*startingCapital
     
     dataDaysAgo = -360
     today = dt.datetime.now()
@@ -49,9 +52,11 @@ if __name__ == '__main__':
     stockData = simulator.getStockData("stocksRecord")
     itemsToSell = []
     currentHeldStocks = {}
+    allStockData = {}
     
     for date in range(dataDaysAgo, 0):
         currentDate = (today + dt.timedelta(date)).strftime('%Y-%m-%d')
+        maxPurchase = maxPurchasePercentage*currentNetWorth
         
         # Buy stocks at beginning of day
         for number, stock in stockData.items():
@@ -65,6 +70,11 @@ if __name__ == '__main__':
                     if quantity > 0:
                         investableCapital -= round((buyPrice*quantity), 2)
                         currentHeldStocks = simulator.buyStock(stock, currentHeldStocks, quantity)
+                        
+                # Add all stock data to dictionary from purchase date until today
+                if stock[0] not in allStockData:
+                    allStockData[stock[0]] = web.DataReader(stock[0], 'iex', currentDate, today)
+                        
 
         # Record all items to sell
         for stockName, stock in currentHeldStocks.items():
@@ -81,10 +91,26 @@ if __name__ == '__main__':
         # can't remove items from dictionary in previous for loop due to runtime error
         for stockName in itemsToSell:
             del currentHeldStocks[stockName]
-            
+        
         itemsToSell.clear()
-        print("Date: ", currentDate) 
-        print("Money ready to invest: $", round(investableCapital, 2))    
+        
+        # Calculate current net worth to determine maximum purchase of any particular stock
+        currentNetWorth = investableCapital
+        tradingDay = True
+        
+        # Calculate net worth based on investable capital and currently held stocks' low for the day
+        for stockName, stock in currentHeldStocks.items():
+            try: 
+                currentNetWorth += float(allStockData[stock[0]].loc[currentDate]['low'])
+            except:
+                tradingDay = False
+         
+        if tradingDay:
+            print("----------------------------------------") 
+            print("Date: ", currentDate) 
+            print("Net Worth: $", round(currentNetWorth, 2))
+        
+        
             
     print("Last Date in Simulation: ", currentDate) 
     print("Initial investment: $", round(startingCapital, 2))    
