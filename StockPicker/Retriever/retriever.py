@@ -38,12 +38,14 @@ class Trade():
     @classmethod
     def getStockHighs(self, data, today, dataDaysAgo):
         stockHighs = {}
-        
+        print("starting stock highs")
         for highDaysAgo in range(dataDaysAgo, 0):
             dateAgo = today + dt.timedelta(highDaysAgo)
             currentHigh = Trade.getHigh(data, today, dateAgo)
             if currentHigh != None:
+                print(currentHigh)
                 stockHighs[dateAgo.strftime('%Y-%m-%d')] = currentHigh
+                print(stockHighs[dateAgo.strftime('%Y-%m-%d')])
         
         return stockHighs   
     
@@ -93,8 +95,8 @@ if __name__ == '__main__':
     
     for stockName in stockNames:
         try:
-            data = web.DataReader(stockName, 'iex', dateAgo, today)
-            stockHighs = Trade.getStockHighs(data, today, dataDaysAgo)
+            data = web.DataReader(stockName, 'IEX_SANDBOX', dateAgo, today)
+            stockHighs = Trade.getStockHighs(data, today, dataDaysAgo) 
             stockLows = Trade.getStockLows(data, today, dataDaysAgo)
             Trade().calculateBuySellDates(data, today, dataDaysAgo, stockName, stockHighs, stockLows)
         except:
