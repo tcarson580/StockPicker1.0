@@ -19,52 +19,68 @@ class TestAnalysis(unittest.TestCase):
         testStock = [stock.test_stock(100, 10, 79, 80)]
         self.assertEquals(bullish.check_hammer(self, testStock), True)
         
-        # Red stock, Real body = 2%, Shadow > 2* Real body
-        testStock = [stock.test_stock(100, 10, 78.4, 80)]
+        # Red stock, Real body < 2%, Shadow = 2* Real body
+        testStock = [stock.test_stock(100, 77, 80, 79)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Green stock, Real body = 2%, Shadow > 2* Real body
+        # Green stock, Real body < 2%, Shadow = 2* Real body
+        testStock = [stock.test_stock(100, 77, 79, 80)]
+        self.assertEquals(bullish.check_hammer(self, testStock), False)
+        
+        # Red stock, Real body < 2%, Shadow < 2* Real body
+        testStock = [stock.test_stock(100, 78, 80, 79)]
+        self.assertEquals(bullish.check_hammer(self, testStock), False)
+        
+        # Green stock, Real body < 2%, Shadow < 2* Real body
+        testStock = [stock.test_stock(100, 78, 79, 80)]
+        self.assertEquals(bullish.check_hammer(self, testStock), False)
+        
+        # Red stock, Real body = 2%, Shadow > 2* Real body
         testStock = [stock.test_stock(100, 10, 80, 78.4)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Red stock, Real body = 2%, Shadow = 2* Real body
-        testStock = [stock.test_stock(100, 74.8, 78.4, 80)]
+        # Green stock, Real body = 2%, Shadow > 2* Real body
+        testStock = [stock.test_stock(100, 10, 78.4, 80)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Green stock, Real body = 2%, Shadow = 2* Real body
+        # Red stock, Real body = 2%, Shadow = 2* Real body
         testStock = [stock.test_stock(100, 74.8, 80, 78.4)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Red stock, Real body = 2%, Shadow < 2* Real body
-        testStock = [stock.test_stock(100, 73, 78.4, 80)]
+        # Green stock, Real body = 2%, Shadow = 2* Real body
+        testStock = [stock.test_stock(100, 74.8, 78.4, 80)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Green stock, Real body = 2%, Shadow < 2* Real body
+        # Red stock, Real body = 2%, Shadow < 2* Real body
         testStock = [stock.test_stock(100, 73, 80, 78.4)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Red stock, Real body > 2%, Shadow > 2* Real body
-        testStock = [stock.test_stock(100, 10, 78, 80)]
+        # Green stock, Real body = 2%, Shadow < 2* Real body
+        testStock = [stock.test_stock(100, 73, 78.4, 80)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Green stock, Real body > 2%, Shadow > 2* Real body
+        # Red stock, Real body > 2%, Shadow > 2* Real body
         testStock = [stock.test_stock(100, 10, 80, 78)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Red stock, Real body > 2%, Shadow = 2* Real body
-        testStock = [stock.test_stock(100, 74.8, 78, 80)]
+        # Green stock, Real body > 2%, Shadow > 2* Real body
+        testStock = [stock.test_stock(100, 10, 78, 80)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
-        # Green stock, Real body > 2%, Shadow = 2* Real body
+        # Red stock, Real body > 2%, Shadow = 2* Real body
         testStock = [stock.test_stock(100, 74.8, 80, 78)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
+        # Green stock, Real body > 2%, Shadow = 2* Real body
+        testStock = [stock.test_stock(100, 74.8, 78, 80)]
+        self.assertEquals(bullish.check_hammer(self, testStock), False)
+        
         # Red stock, Real body > 2%, Shadow < 2* Real body
-        testStock = [stock.test_stock(100, 73, 78, 80)]
+        testStock = [stock.test_stock(100, 73, 80, 78)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
         
         # Green stock, Real body > 2%, Shadow < 2* Real body
-        testStock = [stock.test_stock(100, 73, 80, 78)]
+        testStock = [stock.test_stock(100, 73, 78, 80)]
         self.assertEquals(bullish.check_hammer(self, testStock), False)
 
     def test_checkInverseHammer(self):
