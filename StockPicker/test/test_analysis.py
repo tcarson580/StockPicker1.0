@@ -9,6 +9,7 @@ from analysis.bullish import BullishAnalysis as bullish
 
 # Test stocks must be placed into list due to possibility for 
 # multiple stocks being required to meet candlestick definitions
+# TODO: Add tests for upper wick being close to real body
 class TestAnalysis(unittest.TestCase):
     def test_checkHammer(self):
         # Red stock, Real body < 2%, Shadow > 2* Real body
