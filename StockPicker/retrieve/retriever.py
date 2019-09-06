@@ -22,19 +22,23 @@ class StockDataRetriever:
                                        endDate=endDate,
                                        frequency='daily')
     
-    def getHigh(self, stockData, daysAgo):
-        daysAgo = -1*daysAgo    
+    @staticmethod
+    def getHigh(stockData, daysAgo):
+        daysAgo = -1*daysAgo   
         return stockData[daysAgo].get('high')
     
-    def getLow(self, stockData, daysAgo):
+    @staticmethod
+    def getLow(stockData, daysAgo):
         daysAgo = -1*daysAgo    
         return stockData[daysAgo].get('low')
     
-    def getOpen(self, stockData, daysAgo):
+    @staticmethod
+    def getOpen(stockData, daysAgo):
         daysAgo = -1*daysAgo    
         return stockData[daysAgo].get('open')
     
-    def getClose(self, stockData, daysAgo):
+    @staticmethod
+    def getClose(stockData, daysAgo):
         daysAgo = -1*daysAgo    
         return stockData[daysAgo].get('close')
     
